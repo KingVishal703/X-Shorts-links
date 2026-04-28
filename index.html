@@ -9,165 +9,122 @@
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;600&display=swap" rel="stylesheet">
 
 <style>
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-  font-family: 'Poppins', sans-serif;
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+  font-family:'Poppins',sans-serif;
 }
 
-body {
-  height: 100vh;
-  background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  color: #fff;
+body{
+  background:linear-gradient(135deg,#0f2027,#203a43,#2c5364);
+  height:100vh;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  color:#fff;
 }
 
-.card {
-  background: rgba(255, 255, 255, 0.05);
-  backdrop-filter: blur(10px);
-  border-radius: 20px;
-  padding: 40px 30px;
-  text-align: center;
-  width: 320px;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+.container{
+  background:rgba(255,255,255,0.05);
+  padding:30px;
+  border-radius:15px;
+  text-align:center;
+  backdrop-filter:blur(10px);
+  box-shadow:0 0 20px rgba(0,0,0,0.4);
+  width:90%;
+  max-width:350px;
 }
 
-h2 {
-  font-weight: 600;
-  margin-bottom: 10px;
+h2{
+  font-weight:600;
+  margin-bottom:10px;
 }
 
-p {
-  font-size: 14px;
-  opacity: 0.8;
+p{
+  font-size:14px;
+  color:#ccc;
+  margin-bottom:20px;
 }
 
-.loader {
-  margin: 25px auto;
-  width: 50px;
-  height: 50px;
-  border: 5px solid rgba(255,255,255,0.1);
-  border-top: 5px solid #00ffcc;
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
+.loader{
+  border:5px solid rgba(255,255,255,0.1);
+  border-top:5px solid #00ffcc;
+  border-radius:50%;
+  width:40px;
+  height:40px;
+  margin:20px auto;
+  animation:spin 1s linear infinite;
 }
 
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+@keyframes spin{
+  0%{transform:rotate(0deg);}
+  100%{transform:rotate(360deg);}
 }
 
-.progress {
-  width: 100%;
-  height: 5px;
-  background: rgba(255,255,255,0.1);
-  border-radius: 10px;
-  overflow: hidden;
-  margin-top: 20px;
+button{
+  background:#00ffcc;
+  color:#000;
+  border:none;
+  padding:12px 20px;
+  border-radius:8px;
+  font-weight:600;
+  cursor:pointer;
+  transition:0.3s;
+  width:100%;
 }
 
-.progress-bar {
-  height: 100%;
-  width: 0%;
-  background: #00ffcc;
-  animation: load 2s linear forwards;
+button:hover{
+  background:#00ccaa;
 }
 
-@keyframes load {
-  from { width: 0%; }
-  to { width: 100%; }
-}
-
-.btn {
-  display: none;
-  margin-top: 20px;
-  padding: 12px 18px;
-  border-radius: 12px;
-  background: #00ffcc;
-  color: #000;
-  border: none;
-  font-weight: 600;
-  cursor: pointer;
-}
-
-.error {
-  color: #ff4d4d;
-  font-weight: 500;
+.error{
+  color:#ff4d4d;
+  font-weight:500;
 }
 </style>
 </head>
 
 <body>
 
-<div class="card">
+<div class="container">
   <h2>🔐 Secure Redirect</h2>
-  <p>Click below to open your link securely</p>
+  <p>Click the button below to continue safely</p>
 
   <div class="loader"></div>
 
-  <div class="progress">
-    <div class="progress-bar"></div>
-  </div>
+  <button id="goBtn">Continue</button>
 
-  <button id="openBtn" class="btn">Open in Chrome</button>
+  <p id="msg" class="error"></p>
 </div>
 
 <script>
-// ❌ Disable right click
-document.addEventListener("contextmenu", e => e.preventDefault());
-
-// ❌ Disable dev tools keys
-document.addEventListener("keydown", function(e) {
-  if (
-    e.key === "F12" ||
-    (e.ctrlKey && e.shiftKey && ["I","J","C"].includes(e.key)) ||
-    (e.ctrlKey && e.key === "U")
-  ) {
-    e.preventDefault();
-  }
-});
-
 const encoded = new URLSearchParams(window.location.search).get("id");
-
-// 🔐 Double decode
-function decodeSecure(data) {
-  try {
-    return atob(atob(data));
-  } catch {
-    return null;
-  }
-}
-
-// 🔒 Chrome intent open
-function openInChrome(url) {
-  const intent = "intent://" + url.replace(/^https?:\/\//, "") + "#Intent;scheme=https;package=com.android.chrome;end";
-  window.location.href = intent;
-}
+let finalUrl = "";
 
 if (encoded) {
   try {
-    const decoded = decodeSecure(encoded);
-
-    if (!decoded) throw "Invalid";
-
-    const btn = document.getElementById("openBtn");
-    btn.style.display = "inline-block";
-
-    btn.onclick = () => {
-      openInChrome(decoded);
-    };
-
+    finalUrl = atob(encoded);
   } catch (err) {
-    document.querySelector(".card").innerHTML =
-      "<h3 class='error'>⚠️ Invalid or Protected Link!</h3>";
+    document.getElementById("msg").innerText = "⚠️ Invalid redirect link!";
   }
 } else {
-  document.querySelector(".card").innerHTML =
-    "<h3 class='error'>❌ Missing redirect ID!</h3>";
+  document.getElementById("msg").innerText = "❌ Missing redirect ID!";
 }
+
+document.getElementById("goBtn").onclick = function() {
+  if (!finalUrl) return;
+
+  // Try to force open in Chrome (Android)
+  const chromeUrl = "intent://" + finalUrl.replace(/^https?:\/\//, "") + "#Intent;scheme=https;package=com.android.chrome;end";
+
+  window.location.href = chromeUrl;
+
+  // Fallback (agar Chrome open nahi hua)
+  setTimeout(() => {
+    window.location.href = finalUrl;
+  }, 1500);
+};
 </script>
 
 </body>
