@@ -1,50 +1,126 @@
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8"></meta>
-  <title>Redirecting...</title>
-  <meta content="noindex,nofollow" name="robots"></meta>
-  <meta content="width=device-width, initial-scale=1.0" name="viewport"></meta>
-  <style>
-    body {
-      background: #000;
-      color: #0f0;
-      font-family: Arial, sans-serif;
-      text-align: center;
-      padding-top: 20%;
-    }
-    .loader {
-      border: 6px solid #222;
-      border-top: 6px solid #0f0;
-      border-radius: 50%;
-      width: 40px;
-      height: 40px;
-      margin: 20px auto;
-      animation: spin 1s linear infinite;
-    }
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
-  </style>
+<meta charset="UTF-8">
+<title>Redirecting...</title>
+<meta name="robots" content="noindex,nofollow">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;600&display=swap" rel="stylesheet">
+
+<style>
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Poppins', sans-serif;
+  }
+
+  body {
+    height: 100vh;
+    background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #fff;
+  }
+
+  .card {
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(10px);
+    border-radius: 20px;
+    padding: 40px 30px;
+    text-align: center;
+    width: 300px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+  }
+
+  h2 {
+    font-weight: 600;
+    margin-bottom: 10px;
+  }
+
+  p {
+    font-size: 14px;
+    opacity: 0.8;
+  }
+
+  .loader {
+    margin: 25px auto;
+    width: 50px;
+    height: 50px;
+    border: 5px solid rgba(255,255,255,0.1);
+    border-top: 5px solid #00ffcc;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+  }
+
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+
+  .progress {
+    width: 100%;
+    height: 5px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 10px;
+    overflow: hidden;
+    margin-top: 20px;
+  }
+
+  .progress-bar {
+    height: 100%;
+    width: 0%;
+    background: #00ffcc;
+    animation: load 2s linear forwards;
+  }
+
+  @keyframes load {
+    from { width: 0%; }
+    to { width: 100%; }
+  }
+
+  .error {
+    color: #ff4d4d;
+    font-weight: 500;
+  }
+</style>
 </head>
+
 <body>
-  <h2>🔁 Redirecting... Please wait</h2>
-  <div class="loader"></div>
+
+<div class="card">
+  <h2>🔁 Redirecting</h2>
+  <p>Please wait while we take you to your destination...</p>
   
-  <script>
-    const encoded = new URLSearchParams(window.location.search).get("id");
-    if (encoded) {
-      try {
-        const decoded = atob(encoded); // Decode Base64 to get real shortlink
-        setTimeout(() => {
-          window.location.href = decoded; // Redirect after 2 seconds
-        }, 2000);
-      } catch (err) {
-        document.body.innerHTML = "<h3>⚠️ Invalid redirect link!</h3>";
-      }
-    } else {
-      document.body.innerHTML = "<h3>❌ Missing redirect ID!</h3>";
+  <div class="loader"></div>
+
+  <div class="progress">
+    <div class="progress-bar"></div>
+  </div>
+</div>
+
+<script>
+  const encoded = new URLSearchParams(window.location.search).get("id");
+
+  if (encoded) {
+    try {
+      const decoded = atob(encoded);
+
+      setTimeout(() => {
+        window.location.href = decoded;
+      }, 2000);
+
+    } catch (err) {
+      document.querySelector(".card").innerHTML =
+        "<h3 class='error'>⚠️ Invalid redirect link!</h3>";
     }
-  </script>
+  } else {
+    document.querySelector(".card").innerHTML =
+      "<h3 class='error'>❌ Missing redirect ID!</h3>";
+  }
+</script>
+
 </body>
 </html>
