@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Redirecting...</title>
+<title>Secure Redirect</title>
 <meta name="robots" content="noindex,nofollow">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
@@ -84,12 +84,13 @@ p {
 .btn {
   display: none;
   margin-top: 20px;
-  padding: 10px 15px;
-  border-radius: 10px;
+  padding: 12px 18px;
+  border-radius: 12px;
   background: #00ffcc;
   color: #000;
-  text-decoration: none;
-  font-weight: 500;
+  border: none;
+  font-weight: 600;
+  cursor: pointer;
 }
 
 .error {
@@ -102,46 +103,66 @@ p {
 <body>
 
 <div class="card">
-  <h2>🔁 Redirecting</h2>
-  <p>Please wait while we take you to your destination...</p>
-  
+  <h2>🔐 Secure Redirect</h2>
+  <p>Click below to open your link securely</p>
+
   <div class="loader"></div>
 
   <div class="progress">
     <div class="progress-bar"></div>
   </div>
 
-  <a id="openBtn" class="btn" target="_blank">Open Link</a>
+  <button id="openBtn" class="btn">Open in Chrome</button>
 </div>
 
 <script>
+// ❌ Disable right click
+document.addEventListener("contextmenu", e => e.preventDefault());
+
+// ❌ Disable dev tools keys
+document.addEventListener("keydown", function(e) {
+  if (
+    e.key === "F12" ||
+    (e.ctrlKey && e.shiftKey && ["I","J","C"].includes(e.key)) ||
+    (e.ctrlKey && e.key === "U")
+  ) {
+    e.preventDefault();
+  }
+});
+
 const encoded = new URLSearchParams(window.location.search).get("id");
 
-function isInAppBrowser() {
-  const ua = navigator.userAgent || "";
-  return /Telegram|FBAN|FBAV|Instagram/i.test(ua);
+// 🔐 Double decode
+function decodeSecure(data) {
+  try {
+    return atob(atob(data));
+  } catch {
+    return null;
+  }
+}
+
+// 🔒 Chrome intent open
+function openInChrome(url) {
+  const intent = "intent://" + url.replace(/^https?:\/\//, "") + "#Intent;scheme=https;package=com.android.chrome;end";
+  window.location.href = intent;
 }
 
 if (encoded) {
   try {
-    const decoded = atob(encoded);
+    const decoded = decodeSecure(encoded);
+
+    if (!decoded) throw "Invalid";
 
     const btn = document.getElementById("openBtn");
-    btn.href = decoded;
     btn.style.display = "inline-block";
 
-    // Try Chrome intent (Android)
-    setTimeout(() => {
-      if (isInAppBrowser()) {
-        window.location.href = "intent://" + decoded.replace(/^https?:\/\//, "") + "#Intent;scheme=https;package=com.android.chrome;end";
-      } else {
-        window.location.href = decoded;
-      }
-    }, 2000);
+    btn.onclick = () => {
+      openInChrome(decoded);
+    };
 
   } catch (err) {
     document.querySelector(".card").innerHTML =
-      "<h3 class='error'>⚠️ Invalid redirect link!</h3>";
+      "<h3 class='error'>⚠️ Invalid or Protected Link!</h3>";
   }
 } else {
   document.querySelector(".card").innerHTML =
