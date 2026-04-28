@@ -90,6 +90,7 @@ p {
   color: #000;
   text-decoration: none;
   font-weight: 500;
+  cursor: pointer;
 }
 
 .error {
@@ -103,7 +104,7 @@ p {
 
 <div class="card">
   <h2>🔁 Redirecting</h2>
-  <p>Click the button below to open your link</p>
+  <p>Click the button below to open in Chrome</p>
   
   <div class="loader"></div>
 
@@ -111,21 +112,29 @@ p {
     <div class="progress-bar"></div>
   </div>
 
-  <a id="openBtn" class="btn" target="_blank">Open Link</a>
+  <button id="openBtn" class="btn">Open in Chrome</button>
 </div>
 
 <script>
 const encoded = new URLSearchParams(window.location.search).get("id");
+
+function openInChrome(url) {
+  const intentUrl = "intent://" + url.replace(/^https?:\/\//, "") + "#Intent;scheme=https;package=com.android.chrome;end";
+  window.location.href = intentUrl;
+}
 
 if (encoded) {
   try {
     const decoded = atob(encoded);
 
     const btn = document.getElementById("openBtn");
-    btn.href = decoded;
     btn.style.display = "inline-block";
 
-    // ❌ Auto redirect completely removed
+    btn.onclick = () => {
+      openInChrome(decoded);
+    };
+
+    // ❌ Auto redirect removed completely
 
   } catch (err) {
     document.querySelector(".card").innerHTML =
